@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>sas_unitree_b1z1_control_template</name>
+  <version>0.0.0</version>
+  <description>A template for code interfacing with `sas_robot_driver_unitree_{b1,z1}`. Change this as needed.</description>
+  <maintainer email="juanjose.quirozomana@manchester.ac.uk">Juan Jose Quiroz Omana</maintainer>
+  <license>LGPL</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>sas_robot_driver_unitree_z1</depend>
+  <depend>sas_robot_driver_unitree_b1</depend>
+  <depend>sas_extended_kalman_filter_unitree_b1</depend>
+  <depend>sas_core</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
