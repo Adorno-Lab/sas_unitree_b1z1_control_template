@@ -22,10 +22,10 @@ def generate_launch_description():
                 get_package_share_directory('sas_robot_driver_unitree_z1'), 'launch'),
                 '/real_z1_robot_launch.py'])
         )
-    real_b1_robot_launch = IncludeLaunchDescription(
+    real_b1_robot_echo_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('sas_robot_driver_unitree_b1'), 'launch'),
-            '/real_b1_robot_launch.py'])
+            '/real_b1_robot_echo_launch.py'])
     )    
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -44,7 +44,7 @@ def generate_launch_description():
             parameters=[{
                 "topic_prefix": "/sas_b1/b1_1",
                 "thread_sampling_time_sec": 0.001,
-                "robot_vicon_marker": "B1Z1_Frame_1"
+                "robot_vicon_marker": "B1Z1_Frame_1_ng"
             }]
         ),
     ])
