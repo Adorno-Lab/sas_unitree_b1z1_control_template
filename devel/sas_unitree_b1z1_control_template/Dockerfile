@@ -18,6 +18,9 @@ RUN cp -r ~/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_control_u
 RUN chmod +x ~/git/rap2025_wholebodycontrol/dependencies/install_sas_drivers_b1z1.sh
 RUN bash -c '~/git/rap2025_wholebodycontrol/dependencies/install_sas_drivers_b1z1.sh' 
 
+RUN chmod +x ~/git/rap2025_wholebodycontrol/dependencies/install_robot_constraint_manager.sh
+RUN bash -c '~/git/rap2025_wholebodycontrol/dependencies/install_robot_constraint_manager.sh' 
+
 
 
 RUN bash -c "echo "source /opt/ros/jazzy/setup.bash" >> /etc/bash_env \
