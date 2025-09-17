@@ -52,7 +52,8 @@ def generate_launch_description():
             parameters=[{
                 "topic_prefix": "/sas_b1/b1_1",
                 "thread_sampling_time_sec": 0.001,
-                "robot_vicon_marker": "B1Z1_Frame_1_ng"
+                "robot_vicon_marker_rear": "B1Z1_Frame_robot_white_rear",
+                "robot_vicon_marker_front": "B1Z1_Frame_robot_white_front"
             }]
         ),
 
