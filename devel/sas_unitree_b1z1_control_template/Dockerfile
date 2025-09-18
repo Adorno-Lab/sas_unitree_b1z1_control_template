@@ -10,7 +10,7 @@ RUN cd ~/ros2_ws/src && git clone https://github.com/Adorno-Lab/sas_unitree_b1z1
 
 # Clone the rap2025_wholebodycontrol.
 RUN mkdir -p ~/git
-RUN cd ~/git && git clone https://github.com/Adorno-Lab/rap2025_wholebodycontrol.git -b new_onboard_strategy --recursive
+RUN cd ~/git && git clone https://github.com/Adorno-Lab/rap2025_wholebodycontrol.git --recursive
 RUN cp -r ~/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_extended_kalman_filter_unitree_b1 ~/ros2_ws/src
 RUN cp -r ~/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_control_unitree_b1z1 ~/ros2_ws/src
 

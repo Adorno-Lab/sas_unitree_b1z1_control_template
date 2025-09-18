@@ -18,10 +18,10 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
 def generate_launch_description():
-    real_z1_robot_launch = IncludeLaunchDescription(
+    real_z1_white_robot_launch = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('sas_robot_driver_unitree_z1'), 'launch'),
-                '/real_z1_robot_launch.py'])
+                '/real_z1_white_robot_launch.py'])
         )
     real_b1_white_robot_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
@@ -38,7 +38,7 @@ def generate_launch_description():
             'sigterm_timeout',
             default_value='40'
         ),
-        real_z1_robot_launch,
+        real_z1_white_robot_launch,
         real_b1_white_robot_launch,
         unitree_b1_white_vicon_ekf_launch
     ])
