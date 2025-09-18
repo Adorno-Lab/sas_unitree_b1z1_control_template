@@ -23,16 +23,16 @@ def generate_launch_description():
                 '/real_z1_robot_launch.py'])
         )
 
-    real_b1_white_robot_echo_launch = IncludeLaunchDescription(
+    real_b1_black_robot_echo_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('sas_robot_driver_unitree_b1'), 'launch'),
-            '/real_b1_white_robot_echo_launch.py'])
+            '/real_b1_black_robot_echo_launch.py'])
     )  
 
-    unitree_b1_white_vicon_ekf_launch = IncludeLaunchDescription(
+    unitree_b1_black_vicon_ekf_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('sas_extended_kalman_filter_unitree_b1'), 'launch'),
-            '/unitree_b1_white_vicon_ekf_launch.py'])
+            '/unitree_b1_black_vicon_ekf_launch.py'])
     ) 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -40,7 +40,7 @@ def generate_launch_description():
             default_value='40'
         ),
         real_z1_robot_launch,
-        real_b1_white_robot_echo_launch,
-        unitree_b1_white_vicon_ekf_launch
+        real_b1_black_robot_echo_launch,
+        unitree_b1_black_vicon_ekf_launch
 
     ])
