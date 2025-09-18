@@ -16,36 +16,29 @@ from launch.actions import DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 
+
 def generate_launch_description():
     real_z1_robot_launch = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([os.path.join(
                 get_package_share_directory('sas_robot_driver_unitree_z1'), 'launch'),
                 '/real_z1_robot_launch.py'])
         )
-    real_b1_robot_echo_launch = IncludeLaunchDescription(
+    real_b1_white_robot_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('sas_robot_driver_unitree_b1'), 'launch'),
-            '/real_b1_robot_echo_launch.py'])
-    )    
+            '/real_b1_white_robot_launch.py'])
+    )
+    unitree_b1_white_vicon_ekf_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([os.path.join(
+            get_package_share_directory('sas_extended_kalman_filter_unitree_b1'), 'launch'),
+            '/unitree_b1_white_vicon_ekf_launch.py'])
+    )       
     return LaunchDescription([
         DeclareLaunchArgument(
             'sigterm_timeout',
             default_value='40'
         ),
         real_z1_robot_launch,
-        real_b1_robot_echo_launch,
-        
-        Node(
-            package='sas_extended_kalman_filter_unitree_b1',
-            executable='sas_extended_kalman_filter_unitree_b1_node',
-            name='ekf_b1_1',
-            namespace="sas_b1",
-            output="screen",
-            parameters=[{
-                "topic_prefix": "/sas_b1/b1_1",
-                "thread_sampling_time_sec": 0.001,
-                "robot_vicon_marker_rear": "B1Z1_Frame_robot_white_rear",
-                "robot_vicon_marker_front": "B1Z1_Frame_robot_white_front"
-            }]
-        ),
+        real_b1_white_robot_launch,
+        unitree_b1_white_vicon_ekf_launch
     ])
