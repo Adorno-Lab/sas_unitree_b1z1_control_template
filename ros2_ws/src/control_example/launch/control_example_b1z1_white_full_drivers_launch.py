@@ -30,7 +30,7 @@ def generate_launch_description():
                 get_package_share_directory('sas_unitree_b1z1_control_template'), 'launch'),
                 '/real_b1z1_white_robot_ekf_launch.py'])
         )
-    conntrol_example = IncludeLaunchDescription(
+    control_example = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
             get_package_share_directory('control_example'), 'launch'),
             '/control_example_b1z1_white_launch.py'])
@@ -42,5 +42,5 @@ def generate_launch_description():
             default_value='40'
         ),
         real_b1z1_white_robot_ekf_launch,
-        conntrol_example,
+        control_example,
     ])
