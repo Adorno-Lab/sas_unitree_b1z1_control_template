@@ -69,7 +69,7 @@ Build the image
 
 ```shell
 cd ~/git/sas_unitree_b1z1_control_template/
-docker build -f devel/sas_unitree_b1z1_control_template/Dockerfile -t sas_unitree_b1z1_control_template .
+docker build --no-cache -f devel/sas_unitree_b1z1_control_template/Dockerfile -t sas_unitree_b1z1_control_template .
 ```
 
 Save the image
