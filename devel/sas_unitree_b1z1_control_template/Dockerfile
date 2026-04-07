@@ -20,8 +20,8 @@ RUN cd ~/git/robot_constraint_editor && mkdir -p build && cd build && cmake .. &
 
 
 
-# Clone the robot_constraint_manager package (branch robot_constrint_editor)
-RUN cd ~/git && git clone --branch robot_constrint_editor https://github.com/Adorno-Lab/robot_constraint_manager 
+# Clone the robot_constraint_manager package
+RUN cd ~/git && git clone https://github.com/Adorno-Lab/robot_constraint_manager 
 RUN cd ~/git/robot_constraint_manager && mkdir -p build && cd build && cmake .. && make && make install
 
 
