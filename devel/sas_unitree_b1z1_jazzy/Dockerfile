@@ -64,7 +64,7 @@ WORKDIR /app
 
 RUN mkdir -p /app/software/ROS2/ros2_ws/src
 
-COPY ./ros2_ws/src/sas_unitree_b1z1_control_template /app/software/ROS2/ros2_ws/src/
+COPY ./ros2_ws/src/sas_unitree_b1z1_control_template /app/software/ROS2/ros2_ws/src/sas_unitree_b1z1_control_template
 COPY ./utils /app/software/ROS2/utils  
 
 
