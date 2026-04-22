@@ -10,7 +10,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: adorno-lab/sas_unitree_b1z1_jazzy
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1 # https://github.com/orgs/community/discussions/45969
-  DOCKERFILE_CONTEXT: "devel/sas_unitree_b1z1_jazzy"
+  DOCKERFILE_CONTEXT: "."  
+  DOCKERFILE_PATH: "devel/sas_unitree_b1z1_jazzy/Dockerfile"  
   DOCKERFILE_NAME: "Dockerfile"
   DOCKERFILE_TAG: "latest"
 
@@ -46,7 +47,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ${{ env.DOCKERFILE_CONTEXT }}
-          file: ${{ env.DOCKERFILE_CONTEXT }}/${{ env.DOCKERFILE_NAME }}
+          file: ${{ env.DOCKERFILE_PATH }}
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.DOCKERFILE_TAG }}_${{ matrix.arch }}
 
