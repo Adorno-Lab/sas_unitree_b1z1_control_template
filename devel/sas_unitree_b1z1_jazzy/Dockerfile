@@ -52,12 +52,20 @@ RUN cp -r ~/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_extended_
 
 # Clone the sas_unitree_b1z1_control_template and copy the pacakges in the ros2_ws/src/ folder
 #######################################################################################################
-RUN cd ~/git && \
-    git clone https://github.com/Adorno-Lab/sas_unitree_b1z1_control_template && \
-    mkdir -p /app/software/ROS2/ros2_ws/src && \
-    cp -r ~/git/sas_unitree_b1z1_control_template/ros2_ws/src/sas_unitree_b1z1_control_template /app/software/ROS2/ros2_ws/src/
+#RUN cd ~/git && \
+#    git clone https://github.com/Adorno-Lab/sas_unitree_b1z1_control_template && \
+#    mkdir -p /app/software/ROS2/ros2_ws/src && \
+#    cp -r ~/git/sas_unitree_b1z1_control_template/ros2_ws/src/sas_unitree_b1z1_control_template /app/software/ROS2/ros2_ws/src/
 
 
+# Copy the template package in the ros2_ws/src/ folder
+#################################################################################################
+WORKDIR /app
+
+RUN mkdir -p /app/software/ROS2/ros2_ws/src
+
+COPY ./ros2_ws/src/sas_unitree_b1z1_control_template /app/software/ROS2/ros2_ws/src/
+COPY ./utils /app/software/ROS2/utils  
 
 
 ##########################################################################################
