@@ -1,4 +1,4 @@
-FROM juanjqo/sas_unitree_b1z1_jazzy
+FROM ghcr.io/adorno-lab/sas_unitree_b1z1_jazzy:latest
 SHELL ["/bin/bash", "-c"]
 ENV BASH_ENV="/etc/bash_env"
 
@@ -29,6 +29,10 @@ RUN cd ~/git/robot_constraint_manager && mkdir -p build && cd build && cmake .. 
 WORKDIR /app
 
 RUN mkdir -p /app/software/ROS2/ros2_ws/src
+
+# Remove the folder sas_unitree_b1z1_control_template. This folder is included by default in the base image (adorno-lab/sas_unitree_b1z1_jazzy)
+# However, all ros2 folders from this repository will be copied to the ros2 directory, including the template package.
+RUN rm -rf /app/software/ROS2/ros2_ws/src/sas_unitree_b1z1_control_template
 
 COPY ./ros2_ws/src/ /app/software/ROS2/ros2_ws/src/
 COPY ./utils /app/software/ROS2/utils  

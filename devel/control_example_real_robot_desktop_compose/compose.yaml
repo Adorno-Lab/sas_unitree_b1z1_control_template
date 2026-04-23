@@ -17,24 +17,43 @@ services:
       source ~/ros2_ws/install/setup.bash;
       ros2 launch motion_capture_tracking launch.py"
 
-  coppeliasim_simros2:
-    build:
-      context: ../..  
-      dockerfile: devel/coppeliasim_simros2/Dockerfile
+  #coppeliasim_simros2:
+  #  build:
+  #    context: ../..  
+  #    dockerfile: devel/coppeliasim_simros2/Dockerfile
+  #  environment:
+  #    DISPLAY: $DISPLAY # x server related
+  #    ROS_DOMAIN_ID: 77 # Set ROS domain ID for all ROS2 nodes
+  #  privileged: true # Needed for some gpu configurations.
+  #  volumes:
+  #    #- repo-data:/root/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_coppeliasim_unitree_b1z1/
+  #    - /tmp/.X11-unix:/tmp/.X11-unix # x server related
+  #    - ~/.Xauthority:/root/.Xauthority # x server related
+  #  network_mode: "host" # x server related
+  #  ipc: "host"
+  #  command: /bin/bash -c "
+  #    sleep 3; 
+  #    source /opt/ros/jazzy/setup.bash;
+  #    ~/utils/CoppeliaSim_Edu_V4_7_0_rev4_Ubuntu24_04/coppeliaSim.sh -s 0 -f app/scenes/ros2_holonomic_b1z1_setup_static.ttt"  
+
+  coppeliasim:
+    image: murilomarinho/coppeliasim:noble_470rev4
+    stop_signal: SIGINT
+    platform: linux/amd64
     environment:
       DISPLAY: $DISPLAY # x server related
-      ROS_DOMAIN_ID: 77 # Set ROS domain ID for all ROS2 nodes
+      ROS_DOMAIN_ID: 77
     privileged: true # Needed for some gpu configurations.
     volumes:
-      #- repo-data:/root/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_coppeliasim_unitree_b1z1/
+      - ../../scenes:/app/coppeliasim/scenes/
       - /tmp/.X11-unix:/tmp/.X11-unix # x server related
       - ~/.Xauthority:/root/.Xauthority # x server related
     network_mode: "host" # x server related
     ipc: "host"
     command: /bin/bash -c "
-      sleep 3; 
-      source /opt/ros/jazzy/setup.bash;
-      ~/utils/CoppeliaSim_Edu_V4_7_0_rev4_Ubuntu24_04/coppeliaSim.sh -s 0 -f app/scenes/ros2_holonomic_b1z1_setup_static.ttt"      
+      sleep 3;
+      cd "$$COPPELIASIM_PATH"
+      && ./coppeliaSim.sh -s0 /app/coppeliasim/scenes/ros2_holonomic_b1z1_setup_static.ttt"          
 
   micro_ros_agent:
     image: microros/micro-ros-agent:jazzy
