@@ -8,8 +8,6 @@ ENV BASH_ENV="/etc/bash_env"
 # Update SAS
 RUN apt update && apt-get install ros-jazzy-sas-* -y
 
-# Install QT
-RUN apt update && apt-get install qt6-base-dev qt6-tools-dev-tools -y
 
 
 ########################################################################################################
@@ -66,7 +64,6 @@ WORKDIR /app
 RUN mkdir -p /app/software/ROS2/ros2_ws/src
 
 COPY ./ros2_ws/src/sas_unitree_b1z1_control_template /app/software/ROS2/ros2_ws/src/sas_unitree_b1z1_control_template
-COPY ./ros2_ws/src/unitree_monitor /app/software/ROS2/ros2_ws/src/unitree_monitor
 COPY ./utils /app/software/ROS2/utils  
 
 
