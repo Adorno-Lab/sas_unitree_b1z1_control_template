@@ -57,6 +57,12 @@ UnitreeB1Z1RobotClient::UnitreeB1Z1RobotClient(std::shared_ptr<Node>& node,
                   this, std::placeholders::_1)
         );
 
+    subscriber_odometry_pose_state_ = node_->create_subscription<geometry_msgs::msg::PoseStamped>(
+        B1_topic_prefix_ + "/get/pose_state", 1,
+        std::bind(&UnitreeB1Z1RobotClient::_callback_pose_state,
+                  this, std::placeholders::_1)
+        );
+
     subscriber_FR_joint_states_ = node_->create_subscription<sensor_msgs::msg::JointState>(
         B1_topic_prefix_  + "/get/FR_joint_states", 1, std::bind(&UnitreeB1Z1RobotClient::_callback_FR_joint_states, this, std::placeholders::_1)
         );
@@ -123,6 +129,15 @@ DQ UnitreeB1Z1RobotClient::get_b1_pose() const
 }
 
 /**
+ * @brief UnitreeB1Z1RobotClient::get_b1_odometry_pose
+ * @return
+ */
+DQ UnitreeB1Z1RobotClient::get_b1_odometry_pose() const
+{
+    return robot_odometry_pose_;
+}
+
+/**
  * @brief UnitreeB1Z1RobotClient::_callback_pose_state
  * @param msg
  */
@@ -130,6 +145,13 @@ void UnitreeB1Z1RobotClient::_callback_pose_state(const geometry_msgs::msg::Pose
 {
     robot_pose_ =   sas::geometry_msgs_pose_stamped_to_dq(msg);
     new_robot_pose_data_available_ = true;
+}
+
+
+ void UnitreeB1Z1RobotClient::_callback_odometry_pose_state(const geometry_msgs::msg::PoseStamped& msg)
+{
+    robot_odometry_pose_ = sas::geometry_msgs_pose_stamped_to_dq(msg);
+    new_robot_odometry_pose_data_available_ = true;
 }
 
 /**

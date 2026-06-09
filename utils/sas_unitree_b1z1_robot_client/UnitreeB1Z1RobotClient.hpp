@@ -88,6 +88,11 @@ protected:
     bool new_arm_data_available_{false};
     Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr subscriber_pose_state_;
     void _callback_pose_state(const geometry_msgs::msg::PoseStamped& msg);
+
+    DQ robot_odometry_pose_;
+    bool new_robot_odometry_pose_data_available_{false};
+    Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr subscriber_odometry_pose_state_;
+    void _callback_odometry_pose_state(const geometry_msgs::msg::PoseStamped& msg);
     //std::shared_ptr<sas::RobotDriverClient> rdi_;
 
     Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr publisher_target_twist_;
@@ -167,6 +172,7 @@ public:
     std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> get_twist_state_time_point() const;
 
     DQ get_b1_pose() const;
+    DQ get_b1_odometry_pose() const;
     void set_arm_joint_positions(const VectorXd& target_joint_positions);
     void set_target_b1_planar_joint_velocities(const VectorXd& q_dot_expressed_at_body_frame, const double& deadband=0.032);
     void set_target_b1_twist(const DQ& twist_expressed_at_body_frame, const double& deadband=0.032);
