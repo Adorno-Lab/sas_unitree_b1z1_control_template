@@ -23,6 +23,7 @@
 
 
 #pragma once
+#include "std_msgs/msg/int32_multi_array.hpp"
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -57,11 +58,23 @@ public:
         RR,
         RL,
     };
-    enum REFERENCE_FRAME
+    enum class REFERENCE_FRAME
     {
         BODY_FRAME,
         INERTIAL_FRAME,
     };
+
+    enum class HighLevelMode : int {
+        IDLE_DEFAULT_STAND = 0,
+        FORCED_STAND = 1,
+        TARGET_VELOCITY_WALKING = 2,
+        PATH_MODE_WALKING = 4,
+        POSITION_STAND_DOWN = 5,
+        POSITION_STAND_UP = 6,
+        DAMPING_MODE = 7,
+        RECOVERY_STAND = 9
+    };
+
 
 protected:
     MODE mode_;
@@ -77,8 +90,14 @@ protected:
     void _callback_pose_state(const geometry_msgs::msg::PoseStamped& msg);
     //std::shared_ptr<sas::RobotDriverClient> rdi_;
 
+    Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr publisher_target_twist_;
     Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_target_holonomic_velocities_;
     Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_target_arm_positions_;
+
+
+    Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr publisher_stand_commands_;
+    Publisher<std_msgs::msg::Int32MultiArray>::SharedPtr   publisher_mode_switch_;
+
 
     VectorXd q_arm_;
     VectorXd qFR_;
@@ -120,6 +139,9 @@ protected:
     Publisher<sas_msgs::msg::Bool>::SharedPtr publisher_Z1_1_shutdown_signal_;
 
 
+    void _set_high_level_mode(const int& mode);
+
+
 public:
     UnitreeB1Z1RobotClient(const UnitreeB1Z1RobotClient&)=delete;
     UnitreeB1Z1RobotClient()=delete;
@@ -147,6 +169,7 @@ public:
     DQ get_b1_pose() const;
     void set_arm_joint_positions(const VectorXd& target_joint_positions);
     void set_target_b1_planar_joint_velocities(const VectorXd& q_dot_expressed_at_body_frame, const double& deadband=0.032);
+    void set_target_b1_twist(const DQ& twist_expressed_at_body_frame, const double& deadband=0.032);
     void send_watchdog_trigger(const double& period_in_seconds = 1.0,
                                const double& maximum_acceptable_delay = 0.5);
 
@@ -157,6 +180,13 @@ public:
 
     std::string get_b1_topic_prefix() const;
     std::string get_z1_topic_prefix() const;
+
+    void set_walking_mode();
+    void set_stand_mode();
+    void set_forced_stand_commands(const double &roll_angle,
+                                   const double &pitch_angle,
+                                   const double &yaw_angle,
+                                   const double &bodyheight = 0);
 
 };
 }

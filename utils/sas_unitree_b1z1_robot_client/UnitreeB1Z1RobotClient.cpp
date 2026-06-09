@@ -93,6 +93,16 @@ UnitreeB1Z1RobotClient::UnitreeB1Z1RobotClient(std::shared_ptr<Node>& node,
 
         publisher_target_holonomic_velocities_ = node_->create_publisher<std_msgs::msg::Float64MultiArray>(
             B1_topic_prefix_ + "/set/holonomic_target_velocities", 1);
+
+        publisher_target_twist_ = node_->create_publisher<geometry_msgs::msg::TwistStamped>(
+            B1_topic_prefix_ + "/set/target_twist", 1);
+
+        publisher_stand_commands_ = node_->create_publisher<std_msgs::msg::Float64MultiArray>(
+            B1_topic_prefix_ + "/set/stand_commands",1);
+
+        publisher_mode_switch_    = node_->create_publisher<std_msgs::msg::Int32MultiArray>(
+            B1_topic_prefix_ + "/set/mode",1
+            );
     }
     if (mode_ == MODE::WATCHDOG)
     {
@@ -279,6 +289,36 @@ void UnitreeB1Z1RobotClient::set_target_b1_planar_joint_velocities(const VectorX
 }
 
 
+void UnitreeB1Z1RobotClient::set_target_b1_twist(const DQ& twist_expressed_at_body_frame, const double &deadband)
+{
+    if (mode_ == MODE::CONTROL && publisher_target_twist_)
+    {
+        VectorXd u_base = twist_expressed_at_body_frame.vec6();
+        // The B1 robot does not move with velocities below 0.03, but the legs continue to move.
+        // Therefore, we enforce a deadband.
+        //const double min_vel = 0.032;
+        for (int i=0;i<u_base.size();i++)
+        {
+            if (std::abs(u_base(i))<=deadband)
+                u_base(i) = 0.0;
+        }
+        geometry_msgs::msg::TwistStamped msg;
+        msg.twist.angular.x = u_base(0);
+        msg.twist.angular.y = u_base(1);
+        msg.twist.angular.z = u_base(2);
+        msg.twist.linear.x  = u_base(3);
+        msg.twist.linear.y  = u_base(4);
+        msg.twist.linear.z  = u_base(5);
+        publisher_target_twist_->publish(msg);
+    }else
+    {
+        RCLCPP_ERROR_STREAM(node_->get_logger(), std::string("::Warning:: UnitreeB1Z1RobotClient::set_target_b1_twist "
+                                                             "is available only in CONTROL mode"));
+    }
+}
+    //publisher_target_twist_
+
+
 /**
  * @brief UnitreeB1Z1RobotClient::get_leg_joint_states returns the joint positions of the desired leg kinematic chain
  * @param leg The desired leg
@@ -453,6 +493,47 @@ std::chrono::time_point<std::chrono::system_clock, std::chrono::nanoseconds> Uni
 {
     return z1_arm_state_time_point_;
 }
+
+
+void UnitreeB1Z1RobotClient::set_walking_mode()
+{
+    _set_high_level_mode(static_cast<int>(HighLevelMode::TARGET_VELOCITY_WALKING));
+}
+
+void UnitreeB1Z1RobotClient::set_stand_mode()
+{
+    _set_high_level_mode(static_cast<int>(HighLevelMode::FORCED_STAND));
+}
+
+void UnitreeB1Z1RobotClient::_set_high_level_mode(const int &mode)
+{
+    if (mode_ == MODE::CONTROL && publisher_mode_switch_)
+    {
+        std_msgs::msg::Int32MultiArray mode_msg;
+        // Set the mode value (e.g., 1 for FORCED_STAND, 2 for TARGET_VELOCITY_WALKING)
+        mode_msg.data.push_back(mode);  // Walking mode
+        publisher_mode_switch_->publish(mode_msg);
+    }
+}
+
+void UnitreeB1Z1RobotClient::set_forced_stand_commands(const double &roll_angle,
+                                                       const double &pitch_angle,
+                                                       const double &yaw_angle,
+                                                       const double &bodyheight)
+{
+    if (mode_ == MODE::CONTROL && publisher_stand_commands_)
+    {
+        std_msgs::msg::Float64MultiArray stand_msg;
+        stand_msg.data.clear();
+        stand_msg.data.push_back(roll_angle);   // Roll angle (radians)
+        stand_msg.data.push_back(pitch_angle);  // Pitch angle (radians)
+        stand_msg.data.push_back(yaw_angle);    // Yaw angle (radians)
+        stand_msg.data.push_back(bodyheight);   // Body height (meters)
+        // Publish the message
+        publisher_stand_commands_->publish(stand_msg);
+    }
+}
+
 
 UnitreeB1Z1RobotClient::~UnitreeB1Z1RobotClient()
 {
