@@ -59,7 +59,7 @@ UnitreeB1Z1RobotClient::UnitreeB1Z1RobotClient(std::shared_ptr<Node>& node,
 
     subscriber_odometry_pose_state_ = node_->create_subscription<geometry_msgs::msg::PoseStamped>(
         B1_topic_prefix_ + "/get/pose_state", 1,
-        std::bind(&UnitreeB1Z1RobotClient::_callback_pose_state,
+        std::bind(&UnitreeB1Z1RobotClient::_callback_odometry_pose_state,
                   this, std::placeholders::_1)
         );
 
@@ -161,7 +161,7 @@ void UnitreeB1Z1RobotClient::_callback_pose_state(const geometry_msgs::msg::Pose
  */
 bool UnitreeB1Z1RobotClient::is_robot_pose_data_available() const
 {
-    return new_robot_pose_data_available_;
+    return new_robot_pose_data_available_ || new_robot_odometry_pose_data_available_;
 }
 
 /**
