@@ -63,6 +63,12 @@ UnitreeB1Z1RobotClient::UnitreeB1Z1RobotClient(std::shared_ptr<Node>& node,
                   this, std::placeholders::_1)
         );
 
+    subscriber_last_IMU_orientation_when_robot_stopped_ = node_->create_subscription<geometry_msgs::msg::PoseStamped>(
+        B1_topic_prefix_ + "/get/last_imu_orientation_when_robot_stopped", 1,
+        std::bind(&UnitreeB1Z1RobotClient::_callback_last_IMU_orientation_when_robot_stopped,
+                  this, std::placeholders::_1)
+        );
+
     subscriber_rpy_imu_state_ = node_->create_subscription<std_msgs::msg::Float64MultiArray>(
         B1_topic_prefix_ + "/get/rpy_angles", 1,
         std::bind(&UnitreeB1Z1RobotClient::_callback_rpy_imu_state,
@@ -152,6 +158,21 @@ DQ UnitreeB1Z1RobotClient::get_b1_IMU_orientation() const
     return robot_odometry_pose_.rotation();
 }
 
+
+/**
+ * @brief UnitreeB1Z1RobotClient::get_b1_last_IMU_orientation_when_robot_stopped
+ * @return
+ */
+DQ UnitreeB1Z1RobotClient::get_b1_last_IMU_orientation_when_robot_stopped() const
+{
+    return last_IMU_orientation_when_robot_stopped_.rotation();
+}
+
+Vector3d UnitreeB1Z1RobotClient::get_rpy_angles_from_IMU() const
+{
+    return rpy_imu_angles_;
+}
+
 /**
  * @brief UnitreeB1Z1RobotClient::_callback_pose_state
  * @param msg
@@ -167,6 +188,12 @@ void UnitreeB1Z1RobotClient::_callback_odometry_pose_state(const geometry_msgs::
 {
     robot_odometry_pose_ = sas::geometry_msgs_pose_stamped_to_dq(msg);
     new_robot_odometry_pose_data_available_ = true;
+}
+
+void UnitreeB1Z1RobotClient::_callback_last_IMU_orientation_when_robot_stopped(const geometry_msgs::msg::PoseStamped& msg)
+{
+    last_IMU_orientation_when_robot_stopped_= sas::geometry_msgs_pose_stamped_to_dq(msg);
+    new_last_IMU_orientation_when_robot_stopped_data_available_ = true;
 }
 
 void UnitreeB1Z1RobotClient::_callback_rpy_imu_state(const std_msgs::msg::Float64MultiArray &msg)

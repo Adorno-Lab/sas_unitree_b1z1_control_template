@@ -95,6 +95,11 @@ protected:
     void _callback_odometry_pose_state(const geometry_msgs::msg::PoseStamped& msg);
     //std::shared_ptr<sas::RobotDriverClient> rdi_;
 
+    DQ last_IMU_orientation_when_robot_stopped_;
+    bool new_last_IMU_orientation_when_robot_stopped_data_available_{false};
+    Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr subscriber_last_IMU_orientation_when_robot_stopped_;
+    void _callback_last_IMU_orientation_when_robot_stopped(const geometry_msgs::msg::PoseStamped& msg);
+
     Vector3d rpy_imu_angles_;
     bool new_robot_rpy_imu_data_available_{false};
     Subscription<std_msgs::msg::Float64MultiArray>::SharedPtr subscriber_rpy_imu_state_;
@@ -179,6 +184,7 @@ public:
     DQ get_b1_pose() const;
     DQ get_b1_odometry_pose() const;
     DQ get_b1_IMU_orientation() const;
+    DQ get_b1_last_IMU_orientation_when_robot_stopped() const;
     Vector3d get_rpy_angles_from_IMU() const;
     void set_arm_joint_positions(const VectorXd& target_joint_positions);
     void set_target_b1_planar_joint_velocities(const VectorXd& q_dot_expressed_at_body_frame, const double& deadband=0.032);
