@@ -26,7 +26,7 @@ https://github.com/user-attachments/assets/120c1893-872f-4812-8e3e-78f159014961
 ### Minimal Example Real Platform (RAICo1)
 
 > [!CAUTION]
-> For using the real robot, you must have the risk assessments in place. This guide is meant to be helpful, but it holds absolutely no liability whatsoever.
+> To use the real robot, you must have the risk assessments in place. This guide is meant to be helpful, but it holds absolutely no liability whatsoever.
 > More details are available in the software license.
 
 > [!warning]
