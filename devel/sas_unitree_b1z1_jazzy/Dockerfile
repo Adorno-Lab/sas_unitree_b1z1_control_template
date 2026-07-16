@@ -23,6 +23,10 @@ RUN mkdir -p /app/software/ROS2/ros2_ws/src
 
 
 ########################################################################################################
+
+# Clone the sas_tools repository
+RUN cd /app/software/ROS2/ros2_ws/src && git clone https://github.com/Adorno-Lab/sas_tools --recursive
+
 # Clone the sas_robot_driver_unitree_z1
 RUN cd /app/software/ROS2/ros2_ws/src && git clone https://github.com/Adorno-Lab/sas_robot_driver_unitree_z1 --recursive
 
