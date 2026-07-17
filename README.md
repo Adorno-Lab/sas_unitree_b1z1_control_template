@@ -62,8 +62,7 @@ You should see
 
 #### Build the sas_unitree_b1z1_control_template image and run it on the B1 onboard computer.
 
-This tutorial assumes you are developing on the Ubuntu Clerice PC. Therefore, the following commands are supposed to be executed
-on the Ubuntu Clerice PC.
+This tutorial assumes you are developing on the Ubuntu Clerice PC. Therefore, the following commands are supposed to be executed on the Ubuntu Clerice PC.
 
 Build the image 
 
