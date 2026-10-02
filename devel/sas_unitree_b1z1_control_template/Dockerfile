@@ -1,4 +1,4 @@
-FROM ghcr.io/adorno-lab/sas_unitree_b1z1_jazzy:latest
+FROM ghcr.io/adorno-lab/clerice_b1/sas_unitree_b1z1_jazzy:02_10_2026_09_59_20
 SHELL ["/bin/bash", "-c"]
 ENV BASH_ENV="/etc/bash_env"
 
@@ -30,7 +30,7 @@ WORKDIR /app
 
 RUN mkdir -p /app/software/ROS2/ros2_ws/src
 
-# Remove the folder sas_unitree_b1z1_control_template. This folder is included by default in the base image (adorno-lab/sas_unitree_b1z1_jazzy)
+# Remove the folder sas_unitree_b1z1_control_template. This folder is included by default in the base image (adorno-lab/clerice_b1/sas_unitree_b1z1_jazzy)
 # However, all ros2 folders from this repository will be copied to the ros2 directory, including the template package.
 RUN rm -rf /app/software/ROS2/ros2_ws/src/sas_unitree_b1z1_control_template
 
