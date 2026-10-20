@@ -60,6 +60,10 @@ struct UnitreeB1EKFConfiguration
  * @brief Planar EKF for the B1. State {x, y, phi} of the trunk. The prediction uses the measured twist
  *        (get/twist of the driver) and the correction uses the Vicon markers (tf). The height comes from Vicon.
  *        Publishes the pose of the trunk on <b1_topic_prefix>/get/ekf/robot_pose.
+ *
+ *        The notation (SIGMA, R, Q, G, K) follows the EKF of Section 3.3 of [1].
+ *
+ *        [1] S. Thrun, W. Burgard, and D. Fox, "Probabilistic Robotics," MIT Press, 2005.
  */
 class UnitreeB1EKF
 {
