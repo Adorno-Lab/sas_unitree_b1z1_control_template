@@ -1,61 +1,50 @@
+# control_example in simulation.
+#   coppeliasim: scenes/unitree_b1z1_ros2.ttt, which simulates the drivers of the B1 and the Z1, and the pose of
+#                the robot (get/ekf/robot_pose).
+#   controller:  control_example (control_example_b1z1_simulation_launch.py).
+# Do not run the real drivers at the same time, on the same ROS_DOMAIN_ID (77, set in the images).
+#
+# From this folder (xhost +local:root if the X server refuses the connection):
+#   docker compose up --build coppeliasim    # then start the simulation in CoppeliaSim
+#   docker compose up --build controller     # in another terminal
 services:
-
-  
-  
   coppeliasim:
-    image: murilomarinho/coppeliasim:noble_470rev4
-    stop_signal: SIGINT
-    platform: linux/amd64
+    image: sas_unitree_b1z1_coppeliasim
+    build:
+      context: ../..
+      dockerfile: devel/sas_unitree_b1z1_coppeliasim/Dockerfile
     environment:
       DISPLAY: $DISPLAY # x server related
-      ROS_DOMAIN_ID: 77
+      XAUTHORITY: /root/.Xauthority # x server related
+      QT_X11_NO_MITSHM: 1 # x server related
+      B1Z1_SCENE_MODE: simulation
     privileged: true # Needed for some gpu configurations.
     volumes:
-      - ../../scenes:/app/coppeliasim/scenes/
       - /tmp/.X11-unix:/tmp/.X11-unix # x server related
-      - ~/.Xauthority:/root/.Xauthority # x server related
-    network_mode: "host" # x server related
+      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro # x server related
+      # Mounted, not copied, so that the scenes saved from CoppeliaSim land in the repository.
+      - ../../scenes:/app/scenes
+    network_mode: "host"
     ipc: "host"
+    stdin_open: true
+    tty: true
     command: /bin/bash -c "
-      sleep 3;
-      cd "$$COPPELIASIM_PATH"
-      && ./coppeliaSim.sh -s0 /app/coppeliasim/scenes/ros2_holonomic_b1z1_setup.ttt"
-  
-  #coppeliasim_simros2:
-  #  build:
-  #    context: ../..  
-  #    dockerfile: devel/coppeliasim_simros2/Dockerfile
-  #  environment:
-  #    DISPLAY: $DISPLAY # x server related
-  #    ROS_DOMAIN_ID: 77 # Set ROS domain ID for all ROS2 nodes
-  #  privileged: true # Needed for some gpu configurations.
-  #  volumes:
-  #    #- repo-data:/root/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_coppeliasim_unitree_b1z1/
-  #    - /tmp/.X11-unix:/tmp/.X11-unix # x server related
-  #    - ~/.Xauthority:/root/.Xauthority # x server related
-  #  network_mode: "host" # x server related
-  #  ipc: "host"
-  #  command: /bin/bash -c "
-  #    sleep 3; 
-  #    source /opt/ros/jazzy/setup.bash;
-  #    ~/utils/CoppeliaSim_Edu_V4_7_0_rev4_Ubuntu24_04/coppeliaSim.sh -s 0 -f app/scenes/ros2_holonomic_b1z1_setup.ttt"
+      $${COPPELIASIM_PATH}/coppeliaSim.sh /app/scenes/unitree_b1z1_ros2.ttt"
 
-
-  sas_unitree_b1z1_control_template:
+  controller:
+    image: sas_unitree_b1z1_control_template
     build:
-      context: ../..  
+      context: ../..
       dockerfile: devel/sas_unitree_b1z1_control_template/Dockerfile
     environment:
       DISPLAY: $DISPLAY # x server related
-      ROS_DOMAIN_ID: 77 # Set ROS domain ID for all ROS2 nodes
-    privileged: true # Needed for some gpu configurations.
     volumes:
-      #- repo-data:/root/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_coppeliasim_unitree_b1z1/
       - /tmp/.X11-unix:/tmp/.X11-unix # x server related
       - ~/.Xauthority:/root/.Xauthority # x server related
-    network_mode: "host" # x server related
+    network_mode: "host"
     ipc: "host"
+    stdin_open: true
+    tty: true
+    stop_grace_period: 30s # sigterm_timeout of the launch file.
     command: /bin/bash -c "
-      source /opt/ros/jazzy/setup.bash;
-      cd /app/software/ROS2/ros2_ws/ && source install/setup.bash && colcon build;
-      ros2 launch control_example control_example_b1z1_simulation_launch.py "
+      ros2 launch control_example control_example_b1z1_simulation_launch.py"

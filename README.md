@@ -11,13 +11,18 @@
 > 
 > <img width="300" alt="capybara_mobile" src="https://github.com/user-attachments/assets/34fde07d-b20a-4460-b34d-432854d5caa9" />
 
-### Minimal Example Simulation (CoppeliaSim + simROS2)
+### Minimal Example Simulation (CoppeliaSim)
 
 Tested  on Ubuntu Amd64
 ```shell
 cd ~/git/sas_unitree_b1z1_control_template/devel/control_example_simulation_compose/
 xhost +local:root
-docker compose up
+docker compose up --build coppeliasim
+```
+Start the simulation in CoppeliaSim. Then, in another terminal:
+```shell
+cd ~/git/sas_unitree_b1z1_control_template/devel/control_example_simulation_compose/
+docker compose up --build controller
 ```
 
 https://github.com/user-attachments/assets/120c1893-872f-4812-8e3e-78f159014961
