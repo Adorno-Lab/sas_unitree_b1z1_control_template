@@ -560,6 +560,9 @@ class UnitreeB1Driver(Node):
         info.supports_base_height_while_walking = False
         info.min_base_roll, info.min_base_pitch, info.min_base_yaw = BASE_ORIENTATION_LOWER_LIMITS
         info.max_base_roll, info.max_base_pitch, info.max_base_yaw = BASE_ORIENTATION_UPPER_LIMITS
+        info.min_base_height = NOMINAL_BASE_HEIGHT - MAX_BASE_HEIGHT_DELTA
+        info.max_base_height = NOMINAL_BASE_HEIGHT + MAX_BASE_HEIGHT_DELTA
+        info.nominal_base_height = NOMINAL_BASE_HEIGHT
         self.info_pub.publish(info)
 
     def send_imu(self):

@@ -54,6 +54,13 @@ source ~/ros2_ws/install/setup.bash
 ~/Downloads/CoppeliaSim_Edu_V4_7_0_rev4_Ubuntu24_04/coppeliaSim.sh ~/git/sas_unitree_b1z1_control_template/scenes/unitree_b1z1_ros2.ttt
 ```
 
+To command the simulated robot by hand, start the simulation and use `sas_legged_client_window` of sas_tools, with the
+same `ROS_DOMAIN_ID`:
+
+```shell
+ros2 launch sas_legged_client_window sas_legged_client_window_launch.py own_driver_limb_prefixes:="['sas_z1/z1_1']"
+```
+
 > [!NOTE]
 > After editing a script in `scenes/scripts/`, paste it into the script of the same name in the scene (without the
 > `#python` line), and save the scene.
