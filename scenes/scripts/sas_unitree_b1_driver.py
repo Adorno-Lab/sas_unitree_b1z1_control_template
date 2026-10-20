@@ -13,6 +13,7 @@ Topics, under TOPIC_PREFIX (same names, types, and QoS as the real driver):
     get/info                     sas_legged_msgs/LeggedRobotInfo (transient_local)
     get/status                   sas_legged_msgs/LeggedRobotStatus
     get/imu                      sensor_msgs/Imu (imu_link of the B1)
+    get/twist                    geometry_msgs/TwistStamped (measured twist of the base, body frame)
     set/high_level_mode          sas_legged_msgs/HighLevelMode
     set/target_twist             geometry_msgs/TwistStamped (WALKING)
     set/target_base_height       std_msgs/Float64 (STANDING)
@@ -31,6 +32,8 @@ and under TOPIC_PREFIX/<limb>, for front_right_leg, front_left_leg, rear_right_l
 Behaviour of the real driver that is emulated:
     - The robot starts in IDLE. Modes: IDLE (zero velocity), STANDING (base orientation and height), and
       WALKING (twist). The legs never accept targets.
+    - The measured twist (get/twist) is the velocity of the base in the body frame (vx, vy, wz), the one the
+      trunk moves with (the B1 publishes the estimate of its locomotion controller).
     - The twist is saturated to the ranges of the B1: vx [-0.8, 1.2] m/s, vy [-0.25, 0.25] m/s,
       wz [-0.75, 0.75] rad/s. It is zero if no twist arrived for TWIST_TIMEOUT_SEC (twist_timeout_sec).
     - Entering STANDING: the robot stops (zero velocity) until its velocity is below 0.1, and then stands.
@@ -339,6 +342,7 @@ class UnitreeB1Driver(Node):
         self.info_pub = self.create_publisher(LeggedRobotInfo, f'{p}/get/info', info_qos)
         self.status_pub = self.create_publisher(LeggedRobotStatus, f'{p}/get/status', 1)
         self.imu_pub = self.create_publisher(Imu, f'{p}/get/imu', 1)
+        self.measured_twist_pub = self.create_publisher(TwistStamped, f'{p}/get/twist', 1)
         # The base has no joints: its SAS joint topics exist, but they are empty.
         self.base_joint_states_pub = self.create_publisher(JointState, f'{p}/get/joint_states', 1)
         self.base_min_pub = self.create_publisher(Float64MultiArray, f'{p}/get/joint_positions_min', 1)
@@ -543,6 +547,13 @@ class UnitreeB1Driver(Node):
 
         self.send_imu()
 
+        measured_twist = TwistStamped()
+        measured_twist.header.stamp = stamp
+        measured_twist.twist.linear.x = self.twist_integrator.vx
+        measured_twist.twist.linear.y = self.twist_integrator.vy
+        measured_twist.twist.angular.z = self.twist_integrator.wz
+        self.measured_twist_pub.publish(measured_twist)
+
         status = LeggedRobotStatus()
         status.header.stamp = stamp
         status.mode = self.mode
@@ -560,6 +571,7 @@ class UnitreeB1Driver(Node):
         info.supports_base_height = True
         info.supports_base_orientation = True
         info.supports_base_height_while_walking = False
+        info.supports_measured_twist = True
         info.min_base_roll, info.min_base_pitch, info.min_base_yaw = BASE_ORIENTATION_LOWER_LIMITS
         info.max_base_roll, info.max_base_pitch, info.max_base_yaw = BASE_ORIENTATION_UPPER_LIMITS
         info.min_base_height = NOMINAL_BASE_HEIGHT - MAX_BASE_HEIGHT_DELTA

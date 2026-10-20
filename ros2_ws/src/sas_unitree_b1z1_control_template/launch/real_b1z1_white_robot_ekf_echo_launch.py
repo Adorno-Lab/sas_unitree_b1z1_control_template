@@ -31,8 +31,8 @@ def generate_launch_description():
 
     unitree_b1_white_vicon_ekf_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('sas_extended_kalman_filter_unitree_b1'), 'launch'),
-            '/unitree_b1_white_vicon_ekf_launch.py'])
+            get_package_share_directory('sas_unitree_b1_ekf'), 'launch'),
+            '/unitree_b1_white_ekf_launch.py'])
     ) 
     return LaunchDescription([
         DeclareLaunchArgument(
