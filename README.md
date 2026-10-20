@@ -23,6 +23,41 @@ docker compose up
 https://github.com/user-attachments/assets/120c1893-872f-4812-8e3e-78f159014961
 
 
+### Simulation scene with the drivers of the B1 and the Z1 (`scenes/unitree_b1z1_ros2.ttt`)
+
+This scene replicates, on the same ROS 2 topics, the drivers of the real robot: a control package written with the
+clients of [sas_tools](https://github.com/Adorno-Lab/sas_tools) (`LeggedRobotDriverClient` and `RobotDriverClient`) runs
+unchanged against the scene or against the robot. It does not use simROS2: Python child scripts (rclpy) emulate each
+driver, as in the scenes of the Unitree G1. Their source is in `scenes/scripts/` (the same text is embedded in the scene).
+
+| Script | Attached to | Emulates |
+|---|---|---|
+| `sas_unitree_b1_driver.py` | `UnitreeB1_1` | `sas_robot_driver_unitree_b1` on `sas_b1/b1_1`: the legged robot driver (modes `IDLE`, `STANDING`, `WALKING`; twist, base orientation, and base height), and the four legs |
+| `sas_unitree_z1_driver.py` | `UnitreeZ1` | `sas_robot_driver_unitree_z1` on `sas_z1/z1_1` (7 joints with the gripper; shutdown on `/sas/set/shutdown`) |
+| `b1_ground_truth_pose.py` | `trunk_respondable` | the localization of the lab (Vicon and EKF): the pose of the trunk on `sas_b1/b1_1/get/ekf/robot_pose` |
+
+The frames `x1` and `xd1` are served by `sas_robot_driver_coppeliasim` (`/sas_robot_driver_coppeliasim/object/x1/...`).
+
+- The base is static and moved by numerical integration: the legs do not step. In `WALKING`, the twist is integrated
+  (saturated to the ranges of the B1). In `STANDING`, the whole robot tilts and rises with the target orientation and
+  height (there is no inverse kinematics to keep the feet on the ground). The legs are not respondable.
+- The behaviour of the real drivers that is emulated (twist timeout, stop before standing, neutral pose before walking,
+  initial configuration of the Z1, watchdog, shutdown) and the differences with the real robot are described at the top
+  of each script.
+- CoppeliaSim 4.7 runs the scripts with its Python (`defaultPython` in `usrset.txt`), which needs `dqrobotics`, `pyzmq`,
+  and `cbor2`. Start CoppeliaSim from a terminal in which ROS 2 and a workspace with `sas_legged_msgs`
+  ([sas_tools](https://github.com/Adorno-Lab/sas_tools)) are sourced, with the `ROS_DOMAIN_ID` of the controller:
+
+```shell
+source /opt/ros/jazzy/setup.bash
+source ~/ros2_ws/install/setup.bash
+~/Downloads/CoppeliaSim_Edu_V4_7_0_rev4_Ubuntu24_04/coppeliaSim.sh ~/git/sas_unitree_b1z1_control_template/scenes/unitree_b1z1_ros2.ttt
+```
+
+> [!NOTE]
+> After editing a script in `scenes/scripts/`, paste it into the script of the same name in the scene (without the
+> `#python` line), and save the scene.
+
 ### Minimal Example Real Platform (RAICo1)
 
 > [!CAUTION]
