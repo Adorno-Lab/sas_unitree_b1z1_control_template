@@ -16,30 +16,24 @@ find_package(sas_robot_driver REQUIRED)
 find_package(sas_conversions REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(sas_tools REQUIRED)
 
-
-
-set(REPOSITORY_DIR ${CMAKE_SOURCE_DIR}/../../../)
-#include_directories(${REPOSITORY_DIR}/submodules/unitree_kinematics/include/)
-include_directories(${REPOSITORY_DIR}/utils)
 ############################
 # CPP Binary Block [BEGIN] #
 # vvvvvvvvvvvvvvvvvvvvvvvv #
 add_library(${PROJECT_NAME} SHARED
     src/control_example.cpp
-    ${REPOSITORY_DIR}/utils/sas_unitree_b1z1_robot_client/UnitreeB1Z1RobotClient.cpp
     )
 
 target_link_libraries(${PROJECT_NAME}
     dqrobotics
-    dqrobotics-interface-coppeliasim-zmq
     robot_constraint_editor
     robot_constraint_manager
     unitree_kinematics
     Eigen3::Eigen
   )
 ament_target_dependencies(${PROJECT_NAME}
-rclcpp geometry_msgs std_msgs sensor_msgs sas_common sas_core sas_conversions sas_datalogger Eigen3 sas_robot_driver
+rclcpp geometry_msgs std_msgs sensor_msgs sas_common sas_core sas_conversions sas_datalogger Eigen3 sas_robot_driver sas_tools
 )
 target_include_directories(${PROJECT_NAME}
     PUBLIC
@@ -49,13 +43,11 @@ target_include_directories(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${REPOSITORY_DIR}/software/include/
-    $<BUILD_INTERFACE:${REPOSITORY_DIR}/software/src/
     )
 
 ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
 ament_export_dependencies(
-Eigen3 rclcpp geometry_msgs std_msgs sensor_msgs sas_common sas_core sas_conversions robot_constraint_manager
+Eigen3 rclcpp geometry_msgs std_msgs sensor_msgs sas_common sas_core sas_conversions sas_robot_driver sas_tools
     )        
 install(
     DIRECTORY include/
@@ -69,11 +61,6 @@ install(
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include
     )
-
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #
-# CPP Shared Library Block [END] #
-##################################
-
 
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ #
 # CPP Shared Library Block [END] #

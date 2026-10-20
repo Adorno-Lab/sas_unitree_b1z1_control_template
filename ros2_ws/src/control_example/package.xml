@@ -13,6 +13,10 @@
   <depend>sas_core</depend>
   <depend>sas_common</depend>
   <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sas_conversions</depend>
+  <depend>sas_robot_driver</depend>
+  <depend>sas_tools</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

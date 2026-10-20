@@ -2,7 +2,6 @@
 #include <sas_common/sas_common.hpp>
 #include <sas_core/eigen3_std_conversions.hpp>
 #include <dqrobotics/utils/DQ_Math.h>
-//#include "sas_consensus_control_unitree_b1z1/sas_consensus_control_unitree_b1z1.hpp"
 #include "control_example/control_example.hpp"
 
 /*********************************************
@@ -27,21 +26,19 @@ int main(int argc, char** argv)
         throw std::runtime_error("::Error setting the signal int handler.");
     }
 
-    rclcpp::init(argc,argv);
-    auto node = std::make_shared<rclcpp::Node>("sas_consensus_control_node");
+    // Keep our SIGINT handler: the controller stops the robot before leaving.
+    rclcpp::init(argc,argv,rclcpp::InitOptions(),rclcpp::SignalHandlerOptions::None);
+    auto node = std::make_shared<rclcpp::Node>("control_example_node");
 
     try
     {
 
         sas::ControlExampleConfiguration configuration;
-        sas::get_ros_parameter(node,"cs_host",configuration.cs_host);
-        sas::get_ros_parameter(node,"cs_port",configuration.cs_port);
-        sas::get_ros_parameter(node,"cs_TIMEOUT_IN_MILISECONDS",configuration.cs_TIMEOUT_IN_MILISECONDS);
-        sas::get_ros_parameter(node,"cs_B1_robotname",configuration.cs_B1_robotname);
-        sas::get_ros_parameter(node,"cs_Z1_robotname",configuration.cs_Z1_robotname);
         sas::get_ros_parameter(node,"B1_topic_prefix",configuration.B1_topic_prefix);
         sas::get_ros_parameter(node,"Z1_topic_prefix",configuration.Z1_topic_prefix);
-        sas::get_ros_parameter(node, "cs_desired_frame", configuration.cs_desired_frame);
+        sas::get_ros_parameter(node,"x_prefix",configuration.x_prefix);
+        sas::get_ros_parameter(node,"xd_prefix",configuration.xd_prefix);
+        sas::get_ros_parameter(node,"trunk_to_arm_base_translation",configuration.trunk_to_arm_base_translation);
         sas::get_ros_parameter(node,"thread_sampling_time_sec",configuration.thread_sampling_time_sec);
 
         std::vector<double> configuration_limits_min;
@@ -59,9 +56,9 @@ int main(int argc, char** argv)
         configuration.configuration_vel_limits = {sas::std_vector_double_to_vectorxd(config_vel_limits_min),
                                                   sas::std_vector_double_to_vectorxd(config_vel_limits_max)};
 
-        auto driver = std::make_shared<sas::ControlExample>(node,configuration, &kill_this_process);
-        RCLCPP_INFO_STREAM_ONCE(node->get_logger(), "::Loading parameters from parameter server.");
-        driver->control_loop();
+        RCLCPP_INFO_STREAM_ONCE(node->get_logger(), "::Parameters OK.");
+        auto controller = std::make_shared<sas::ControlExample>(node,configuration, &kill_this_process);
+        controller->control_loop();
 
     }
     catch (const std::exception& e)
@@ -70,6 +67,7 @@ int main(int argc, char** argv)
         std::cerr << std::string("::Exception::") << e.what();
     }
 
+    rclcpp::shutdown();
     return 0;
 
 
