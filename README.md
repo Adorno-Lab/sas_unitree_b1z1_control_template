@@ -17,12 +17,7 @@ Tested  on Ubuntu Amd64
 ```shell
 cd ~/git/sas_unitree_b1z1_control_template/devel/control_example_simulation_compose/
 xhost +local:root
-docker compose up --build coppeliasim
-```
-Start the simulation in CoppeliaSim. Then, in another terminal:
-```shell
-cd ~/git/sas_unitree_b1z1_control_template/devel/control_example_simulation_compose/
-docker compose up --build controller
+docker compose up --build
 ```
 
 https://github.com/user-attachments/assets/120c1893-872f-4812-8e3e-78f159014961

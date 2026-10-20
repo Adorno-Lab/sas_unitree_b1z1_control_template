@@ -4,9 +4,10 @@
 #   controller:  control_example (control_example_b1z1_simulation_launch.py).
 # Do not run the real drivers at the same time, on the same ROS_DOMAIN_ID (77, set in the images).
 #
+# CoppeliaSim starts the simulation (-s0), and the controller waits for the simulated drivers.
+#
 # From this folder (xhost +local:root if the X server refuses the connection):
-#   docker compose up --build coppeliasim    # then start the simulation in CoppeliaSim
-#   docker compose up --build controller     # in another terminal
+#   docker compose up --build
 services:
   coppeliasim:
     image: sas_unitree_b1z1_coppeliasim
@@ -29,10 +30,12 @@ services:
     stdin_open: true
     tty: true
     command: /bin/bash -c "
-      $${COPPELIASIM_PATH}/coppeliaSim.sh /app/scenes/unitree_b1z1_ros2.ttt"
+      $${COPPELIASIM_PATH}/coppeliaSim.sh -s0 /app/scenes/unitree_b1z1_ros2.ttt"
 
   controller:
     image: sas_unitree_b1z1_control_template
+    depends_on:
+      - coppeliasim
     build:
       context: ../..
       dockerfile: devel/sas_unitree_b1z1_control_template/Dockerfile
