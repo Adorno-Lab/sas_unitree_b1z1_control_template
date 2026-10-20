@@ -18,8 +18,9 @@ Topics, under TOPIC_PREFIX (same names, types, and QoS as the real driver):
     set/target_base_height       std_msgs/Float64 (STANDING)
     set/target_base_orientation  geometry_msgs/QuaternionStamped (STANDING)
     set/watchdog_trigger         sas_msgs/WatchdogTrigger
-    set/shutdown                 sas_msgs/Bool
     get/joint_states, get/joint_positions_min, get/joint_positions_max (empty)
+and SHUTDOWN_TOPIC (/sas/set/shutdown: the launch files of the real driver remap its set/shutdown there, the topic
+of the emergency stop of the lab),
 and under TOPIC_PREFIX/<limb>, for front_right_leg, front_left_leg, rear_right_leg, rear_left_leg:
     get/joint_states             sensor_msgs/JointState
     get/joint_positions_min      std_msgs/Float64MultiArray
@@ -88,8 +89,9 @@ SCENE_MODE_VARIABLE = 'B1Z1_SCENE_MODE'
 SCENE_MODES = ('simulation',)
 ACTIVE_IN_MODE = 'simulation'
 
-# Same prefix as the real driver (node b1_1 in the namespace sas_b1).
+# Same prefix as the real driver (node b1_1 in the namespace sas_b1), and its remapped shutdown topic.
 TOPIC_PREFIX = '/sas_b1/b1_1'
+SHUTDOWN_TOPIC = '/sas/set/shutdown'
 NODE_NAME = 'coppeliasim_b1_1'
 
 # '..' = the parent of this script object, i.e. the object the script is attached to (in CoppeliaSim 4.7,
@@ -329,7 +331,7 @@ class UnitreeB1Driver(Node):
         self.create_subscription(Float64, self.topic_height, self._base_height_callback, 1)
         self.create_subscription(QuaternionStamped, self.topic_orientation, self._base_orientation_callback, 1)
         self.create_subscription(WatchdogTrigger, self.topic_watchdog, self._watchdog_callback, 1)
-        self.create_subscription(Bool, f'{p}/set/shutdown', self.shutdown_callback, 1)
+        self.create_subscription(Bool, SHUTDOWN_TOPIC, self.shutdown_callback, 1)
 
         info_qos = QoSProfile(depth=1, history=HistoryPolicy.KEEP_LAST,
                               reliability=ReliabilityPolicy.RELIABLE,

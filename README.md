@@ -94,8 +94,15 @@ docker compose up --build
 You should see
 
 - RVIz showing the Vicon markers
-- CoppeliaSim with a B1Z1 static scene running
-- The GUI Unitree monitor, which is equipped with an emergency stop button and the Watchdog commander
+- CoppeliaSim with a B1Z1 static scene running (it does not show the real robots yet: the mirror mode of
+  `scenes/unitree_b1z1_ros2.ttt` will replace it)
+- Two windows of `sas_legged_client_window` ([sas_tools](https://github.com/Adorno-Lab/sas_tools)) in monitor mode,
+  one per B1Z1 (white: `sas_b1/b1_1` and `sas_z1/z1_1`; black: `sas_b1/b1_2` and `sas_z1/z1_2`), each with an emergency
+  stop and a watchdog. The emergency stop publishes on `/sas/set/shutdown`, which stops every driver (the physical
+  emergency stop of the lab publishes there too)
+
+> [!NOTE]
+> The image must provide a version of sas_tools with `sas_legged_client_window`.
 
 <img width="800" alt="Screenshot from 2026-02-24 18-25-28" src="https://github.com/user-attachments/assets/2baaa548-f953-43af-aa51-0ee00b9ffd12" />
 

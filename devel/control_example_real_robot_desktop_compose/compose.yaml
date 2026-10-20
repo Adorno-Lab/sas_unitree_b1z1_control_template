@@ -75,7 +75,14 @@ services:
       - ~/.Xauthority:/root/.Xauthority # x server related
     network_mode: "host" # x server related
     ipc: "host"
+    # One sas_legged_client_window (sas_tools) per robot, in monitor mode: status, emergency stop, and watchdog. The
+    # clocks of this computer and of the robots are not synchronized, so the watchdog does not check the delay of its
+    # triggers (as the former unitree_monitor).
     command: /bin/bash -c "
       source /opt/ros/jazzy/setup.bash;
-      cd /app/software/ROS2/ros2_ws/ && source install/setup.bash && colcon build;
-      ros2 launch sas_monitor_coppeliasim sas_monitor_coppeliasim_and_unitree_monitor_launch.py"
+      cd /app/software/ROS2/ros2_ws/ && source install/setup.bash && colcon build && source install/setup.bash;
+      ros2 launch sas_legged_client_window sas_legged_client_window_launch.py node_name:=b1z1_white_monitor mode:=monitor
+        legged_robot_prefix:=sas_b1/b1_1 own_driver_limb_prefixes:=\"['sas_z1/z1_1']\" watchdog_maximum_acceptable_delay_in_seconds:=1e30 &
+      ros2 launch sas_legged_client_window sas_legged_client_window_launch.py node_name:=b1z1_black_monitor mode:=monitor
+        legged_robot_prefix:=sas_b1/b1_2 own_driver_limb_prefixes:=\"['sas_z1/z1_2']\" watchdog_maximum_acceptable_delay_in_seconds:=1e30 &
+      wait"
