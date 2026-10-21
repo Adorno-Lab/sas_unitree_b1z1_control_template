@@ -35,6 +35,7 @@ driver, as in the scenes of the Unitree G1. Their source is in `scenes/scripts/`
 | `sas_unitree_b1_driver.py` | `UnitreeB1_1` | `sas_robot_driver_unitree_b1` on `sas_b1/b1_1`: the legged robot driver (modes `IDLE`, `STANDING`, `WALKING`; twist, base orientation, and base height), and the four legs |
 | `sas_unitree_z1_driver.py` | `UnitreeZ1` | `sas_robot_driver_unitree_z1` on `sas_z1/z1_1` (7 joints with the gripper; shutdown on `/sas/set/shutdown`) |
 | `b1_ground_truth_pose.py` | `trunk_respondable` | the localization of the lab (Vicon and EKF): the pose of the trunk on `sas_b1/b1_1/get/ekf/robot_pose` |
+| `sas_unitree_b1z1_mirror.py` | `UnitreeB1_1` | nothing: in mirror mode, it shows the real robot (see below) |
 
 The frames `x1` and `xd1` are served by `sas_robot_driver_coppeliasim` (`/sas_robot_driver_coppeliasim/object/x1/...`).
 
@@ -59,6 +60,17 @@ same `ROS_DOMAIN_ID`:
 
 ```shell
 ros2 launch sas_legged_client_window sas_legged_client_window_launch.py own_driver_limb_prefixes:="['sas_z1/z1_1']"
+```
+
+The environment variable `B1Z1_SCENE_MODE` sets the mode of the scene when CoppeliaSim starts:
+
+- `simulation` (default): the scripts above emulate the drivers.
+- `mirror`: the emulated drivers are idle, and `sas_unitree_b1z1_mirror.py` shows the real robot. It only subscribes
+  to the EKF pose (`get/ekf/robot_pose`) and to the joint states of the legs and of the Z1. `B1Z1_MIRROR_ROBOT_ID`
+  chooses the robot: `1` (default, B1Z1-white) or `2` (B1Z1-black).
+
+```shell
+B1Z1_SCENE_MODE=mirror ~/Downloads/CoppeliaSim_Edu_V4_7_0_rev4_Ubuntu24_04/coppeliaSim.sh ~/git/sas_unitree_b1z1_control_template/scenes/unitree_b1z1_ros2.ttt
 ```
 
 > [!NOTE]
@@ -94,15 +106,12 @@ docker compose up --build
 You should see
 
 - RVIz showing the Vicon markers
-- CoppeliaSim with a B1Z1 static scene running (it does not show the real robots yet: the mirror mode of
-  `scenes/unitree_b1z1_ros2.ttt` will replace it)
+- CoppeliaSim with `scenes/unitree_b1z1_ros2.ttt` in mirror mode, showing the B1Z1-white and the frames `x1` and
+  `xd1` of the controller. For the B1Z1-black, set `B1Z1_MIRROR_ROBOT_ID: 2` in the compose file
 - Two windows of `sas_legged_client_window` ([sas_tools](https://github.com/Adorno-Lab/sas_tools)) in monitor mode,
   one per B1Z1 (white: `sas_b1/b1_1` and `sas_z1/z1_1`; black: `sas_b1/b1_2` and `sas_z1/z1_2`), each with an emergency
   stop and a watchdog. The emergency stop publishes on `/sas/set/shutdown`, which stops every driver (the physical
   emergency stop of the lab publishes there too)
-
-> [!NOTE]
-> The image must provide a version of sas_tools with `sas_legged_client_window`.
 
 <img width="800" alt="Screenshot from 2026-02-24 18-25-28" src="https://github.com/user-attachments/assets/2baaa548-f953-43af-aa51-0ee00b9ffd12" />
 

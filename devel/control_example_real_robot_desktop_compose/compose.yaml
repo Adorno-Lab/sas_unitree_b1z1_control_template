@@ -1,3 +1,14 @@
+# Desktop side of the real experiment (Ubuntu Clerice PC). The drivers, the EKF, and the controller run on the
+# B1 (see the README).
+#   ros_jazzy_vicon:   motion_capture_tracking (the Vicon markers on tf) and RViz.
+#   coppeliasim:       scenes/unitree_b1z1_ros2.ttt in mirror mode: it shows the real robot (EKF pose and joint
+#                      states), and the frames x1 and xd1 of the controller.
+#   micro_ros_agent:   the emergency stop of the lab (/sas/set/shutdown).
+#   monitor_windows:   one sas_legged_client_window per B1Z1, in monitor mode (status, emergency stop, watchdog).
+# ROS_DOMAIN_ID=77 for all.
+#
+# From this folder (xhost +local:root if the X server refuses the connection):
+#   docker compose up --build
 services:
   ros_jazzy_vicon:
     build: https://github.com/Adorno-Lab/docker_recipes.git#main:ubuntu_24/ros_jazzy_vicon
@@ -6,7 +17,6 @@ services:
       ROS_DOMAIN_ID: 77 # Set ROS domain ID for all ROS2 nodes
     privileged: true # Needed for some gpu configurations.
     volumes:
-      #- repo-data:/root/sas_tutorial_workspace/src/sas_ur_control_template/
       - /tmp/.X11-unix:/tmp/.X11-unix # x server related
       - ~/.Xauthority:/root/.Xauthority # x server related
     network_mode: "host" # x server related and for ROS2 networking
@@ -17,43 +27,28 @@ services:
       source ~/ros2_ws/install/setup.bash;
       ros2 launch motion_capture_tracking launch.py"
 
-  #coppeliasim_simros2:
-  #  build:
-  #    context: ../..  
-  #    dockerfile: devel/coppeliasim_simros2/Dockerfile
-  #  environment:
-  #    DISPLAY: $DISPLAY # x server related
-  #    ROS_DOMAIN_ID: 77 # Set ROS domain ID for all ROS2 nodes
-  #  privileged: true # Needed for some gpu configurations.
-  #  volumes:
-  #    #- repo-data:/root/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_coppeliasim_unitree_b1z1/
-  #    - /tmp/.X11-unix:/tmp/.X11-unix # x server related
-  #    - ~/.Xauthority:/root/.Xauthority # x server related
-  #  network_mode: "host" # x server related
-  #  ipc: "host"
-  #  command: /bin/bash -c "
-  #    sleep 3; 
-  #    source /opt/ros/jazzy/setup.bash;
-  #    ~/utils/CoppeliaSim_Edu_V4_7_0_rev4_Ubuntu24_04/coppeliaSim.sh -s 0 -f app/scenes/ros2_holonomic_b1z1_setup_static.ttt"  
-
   coppeliasim:
-    image: murilomarinho/coppeliasim:noble_470rev4
-    stop_signal: SIGINT
-    platform: linux/amd64
+    image: sas_unitree_b1z1_coppeliasim
+    build:
+      context: ../..
+      dockerfile: devel/sas_unitree_b1z1_coppeliasim/Dockerfile
     environment:
       DISPLAY: $DISPLAY # x server related
-      ROS_DOMAIN_ID: 77
+      XAUTHORITY: /root/.Xauthority # x server related
+      QT_X11_NO_MITSHM: 1 # x server related
+      B1Z1_SCENE_MODE: mirror
+      B1Z1_MIRROR_ROBOT_ID: 1 # 1: B1Z1-white (sas_b1/b1_1, sas_z1/z1_1), 2: B1Z1-black (sas_b1/b1_2, sas_z1/z1_2)
     privileged: true # Needed for some gpu configurations.
     volumes:
-      - ../../scenes:/app/coppeliasim/scenes/
       - /tmp/.X11-unix:/tmp/.X11-unix # x server related
-      - ~/.Xauthority:/root/.Xauthority # x server related
-    network_mode: "host" # x server related
+      - ${XAUTHORITY:-~/.Xauthority}:/root/.Xauthority:ro # x server related
+      - ../../scenes:/app/scenes
+    network_mode: "host"
     ipc: "host"
+    stdin_open: true
+    tty: true
     command: /bin/bash -c "
-      sleep 3;
-      cd "$$COPPELIASIM_PATH"
-      && ./coppeliaSim.sh -s0 /app/coppeliasim/scenes/ros2_holonomic_b1z1_setup_static.ttt"          
+      $${COPPELIASIM_PATH}/coppeliaSim.sh -s0 /app/scenes/unitree_b1z1_ros2.ttt"
 
   micro_ros_agent:
     image: microros/micro-ros-agent:jazzy
@@ -61,28 +56,24 @@ services:
     command: udp4 --port 8888 -v6
     restart: unless-stopped  # Optional: auto-restart if it crashes
 
-  sas_unitree_b1z1_control_template:
+  monitor_windows:
+    image: sas_unitree_b1z1_control_template
     build:
-      context: ../..  
+      context: ../..
       dockerfile: devel/sas_unitree_b1z1_control_template/Dockerfile
     environment:
       DISPLAY: $DISPLAY # x server related
-      ROS_DOMAIN_ID: 77 # Set ROS domain ID for all ROS2 nodes
     privileged: true # Needed for some gpu configurations.
     volumes:
-      #- repo-data:/root/git/rap2025_wholebodycontrol/software/ROS2/ros2_ws/src/sas_coppeliasim_unitree_b1z1/
       - /tmp/.X11-unix:/tmp/.X11-unix # x server related
       - ~/.Xauthority:/root/.Xauthority # x server related
     network_mode: "host" # x server related
     ipc: "host"
-    # One sas_legged_client_window (sas_tools) per robot, in monitor mode: status, emergency stop, and watchdog. The
-    # clocks of this computer and of the robots are not synchronized, so the watchdog does not check the delay of its
-    # triggers (as the former unitree_monitor).
+    # The clocks of this computer and of the robots are not synchronized, so the watchdog does not check the delay of
+    # its triggers (the default of sas_legged_client_window).
     command: /bin/bash -c "
-      source /opt/ros/jazzy/setup.bash;
-      cd /app/software/ROS2/ros2_ws/ && source install/setup.bash && colcon build && source install/setup.bash;
       ros2 launch sas_legged_client_window sas_legged_client_window_launch.py node_name:=b1z1_white_monitor mode:=monitor
-        legged_robot_prefix:=sas_b1/b1_1 own_driver_limb_prefixes:=\"['sas_z1/z1_1']\" watchdog_maximum_acceptable_delay_in_seconds:=1e30 &
+        legged_robot_prefix:=sas_b1/b1_1 own_driver_limb_prefixes:=\"['sas_z1/z1_1']\" &
       ros2 launch sas_legged_client_window sas_legged_client_window_launch.py node_name:=b1z1_black_monitor mode:=monitor
-        legged_robot_prefix:=sas_b1/b1_2 own_driver_limb_prefixes:=\"['sas_z1/z1_2']\" watchdog_maximum_acceptable_delay_in_seconds:=1e30 &
+        legged_robot_prefix:=sas_b1/b1_2 own_driver_limb_prefixes:=\"['sas_z1/z1_2']\" &
       wait"

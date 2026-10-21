@@ -44,7 +44,7 @@ Attach it as a non-threaded Python child script to the base of the Z1 model (Uni
 ROBOT_BASE_PATH. Launch CoppeliaSim from a terminal where ROS 2 is sourced.
 
 Scene mode: this script only runs when the environment variable B1Z1_SCENE_MODE is 'simulation' (or not
-set) when CoppeliaSim starts.
+set) when CoppeliaSim starts. In 'mirror', it is idle, and sas_unitree_b1z1_mirror.py shows the real robot.
 """
 
 import math
@@ -62,7 +62,7 @@ from sas_msgs.msg import Bool, WatchdogTrigger
 # Configuration
 # ----------------------------------------------------------------------------
 SCENE_MODE_VARIABLE = 'B1Z1_SCENE_MODE'
-SCENE_MODES = ('simulation',)
+SCENE_MODES = ('simulation', 'mirror')
 ACTIVE_IN_MODE = 'simulation'
 
 # Same prefix as the real driver (node z1_1 in the namespace sas_z1), and its remapped shutdown topic.

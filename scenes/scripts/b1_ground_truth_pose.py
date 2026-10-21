@@ -11,7 +11,7 @@ Attach it as a non-threaded Python child script to the trunk of the B1 (trunk_re
 OBJECT_PATH. Launch CoppeliaSim from a terminal where ROS 2 is sourced.
 
 Scene mode: this script only runs when the environment variable B1Z1_SCENE_MODE is 'simulation' (or not
-set) when CoppeliaSim starts.
+set) when CoppeliaSim starts. In 'mirror', it is idle, and sas_unitree_b1z1_mirror.py shows the real robot.
 """
 
 import os
@@ -22,7 +22,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped
 
 SCENE_MODE_VARIABLE = 'B1Z1_SCENE_MODE'
-SCENE_MODES = ('simulation',)
+SCENE_MODES = ('simulation', 'mirror')
 ACTIVE_IN_MODE = 'simulation'
 
 TOPIC = '/sas_b1/b1_1/get/ekf/robot_pose'

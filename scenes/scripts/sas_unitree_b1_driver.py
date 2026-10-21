@@ -65,7 +65,7 @@ Attach it as a non-threaded Python child script to the model base (UnitreeB1_1),
 Launch CoppeliaSim from a terminal where ROS 2 and the workspace with sas_legged_msgs are sourced.
 
 Scene mode: this script only runs when the environment variable B1Z1_SCENE_MODE is 'simulation' (or not
-set) when CoppeliaSim starts.
+set) when CoppeliaSim starts. In 'mirror', it is idle, and sas_unitree_b1z1_mirror.py shows the real robot.
 """
 
 import math
@@ -86,10 +86,11 @@ from sas_legged_msgs.msg import HighLevelMode, LeggedRobotInfo, LeggedRobotStatu
 # ----------------------------------------------------------------------------
 # Configuration
 # ----------------------------------------------------------------------------
-# Scene mode, chosen with an environment variable when CoppeliaSim is started. Only 'simulation' (the
-# simulated drivers run) exists for now.
+# Scene mode, chosen with an environment variable when CoppeliaSim is started:
+#   'simulation' (default): the simulated drivers run;
+#   'mirror': sas_unitree_b1z1_mirror.py shows the real robot, and the simulated drivers are idle.
 SCENE_MODE_VARIABLE = 'B1Z1_SCENE_MODE'
-SCENE_MODES = ('simulation',)
+SCENE_MODES = ('simulation', 'mirror')
 ACTIVE_IN_MODE = 'simulation'
 
 # Same prefix as the real driver (node b1_1 in the namespace sas_b1), and its remapped shutdown topic.
