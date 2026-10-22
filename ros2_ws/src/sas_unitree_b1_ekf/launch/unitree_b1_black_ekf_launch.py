@@ -20,7 +20,7 @@ def generate_launch_description():
                 'robot_vicon_marker_rear': 'B1Z1_Frame_robot_black_rear',
                 'robot_vicon_marker_front': 'B1Z1_Frame_robot_black_front',
                 'marker_timeout_sec': 0.1,
-                'max_marker_tilt_rad': 0.1,
+                'max_marker_tilt_rad': 0.45,
                 'initialization_samples': 100,
                 'rear_marker_to_trunk_translation': [0.25, 0.0, -0.17],
                 'process_noise': [0.05, 0.05, 0.05],
